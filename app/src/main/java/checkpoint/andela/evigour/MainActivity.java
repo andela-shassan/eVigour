@@ -2,6 +2,9 @@ package checkpoint.andela.evigour;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
@@ -11,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,11 +29,13 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
-    private boolean counnting;
+    private static final String DEFAULT_EVIGOUR_TONE = "content://settings/system/notification_sound";
     private TextView counts;
     private Button operate;
     private ImageView gifView, bell;
     private DrawerLayout drawer;
+    private Ringtone ringtone;
+    private String pushUpDuration, pushUpNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +64,9 @@ public class MainActivity extends AppCompatActivity
         operate = (Button) findViewById(R.id.start_btn);
         operate.setOnClickListener(this);
 
-    }
+        ringtone = playTone();
+        pushUpDuration = loadString("push_up_duration", "5");
 
-    @Override
-    public void onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     @Override
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch (id){
+        switch (id) {
             case R.id.nav_report:
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
@@ -110,17 +110,22 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onClick(View v) {
-        String s = loadString("push_up_duration", "5");
-        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-        operate.setVisibility(View.GONE);
-        gifView.setVisibility(View.VISIBLE);
-        int k = Integer.parseInt(s);
-        countDown(k);
+        if (operate.getText().toString().startsWith("Start")) {
+            String s = loadString("push_up_duration", "5");
+            Toast.makeText(this, s+ " Minute(s) Push Ups", Toast.LENGTH_LONG).show();
+            operate.setVisibility(View.GONE);
+            gifView.setVisibility(View.VISIBLE);
+            int k = Integer.parseInt(s);
+            countDown(k);
+        } else if (operate.getText().toString().startsWith("Stop")) {
+            //playTone().stop();
+            ringtone.stop();
+            operate.setText("Start");
+        }
 
     }
-
     private void countDown(final int i) {
-        new CountDownTimer(i*60*1000, 1000) {
+        new CountDownTimer(i * 60 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 String time = timeFormatter(millisUntilFinished);
@@ -131,10 +136,17 @@ public class MainActivity extends AppCompatActivity
             public void onFinish() {
                 counts.setText("DONE!");
                 gifView.setVisibility(View.GONE);
+                operate.setText("Stop");
                 operate.setVisibility(View.VISIBLE);
-                bell.setVisibility(View.VISIBLE);
+                ringtone.play();
             }
         }.start();
+    }
+
+    private Ringtone playTone() {
+        Uri ringtone = Uri.parse(loadString("evigour_notifications_tone", DEFAULT_EVIGOUR_TONE));
+        Ringtone r = RingtoneManager.getRingtone(this, ringtone);
+        return r;
     }
 
     public String loadString(String key, String defaultValue) {
@@ -147,8 +159,16 @@ public class MainActivity extends AppCompatActivity
                 TimeUnit.MILLISECONDS.toMinutes(milliseconds) % TimeUnit.HOURS.toMinutes(1),
                 TimeUnit.MILLISECONDS.toSeconds(milliseconds) % TimeUnit.MINUTES.toSeconds(1));
     }
-}
 
-/**
- * String rem = String.format("%02d:%02d:%02d", ((millisUntilFinished / 1000)/3600)%24, ((millisUntilFinished / 1000)/60)%60, (millisUntilFinished / 1000)/(i%60)%60);
- */
+    @Override
+    public void onBackPressed() {
+        if(ringtone.isPlaying()){
+            ringtone.stop();
+            Log.d("semiu", String.valueOf(ringtone.isPlaying()));
+        }
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
+        super.onBackPressed();
+    }
+}
