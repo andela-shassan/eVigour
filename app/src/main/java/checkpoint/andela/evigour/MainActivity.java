@@ -1,8 +1,10 @@
 package checkpoint.andela.evigour;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -23,7 +26,8 @@ public class MainActivity extends AppCompatActivity
     private boolean counnting;
     private TextView counts;
     private Button operate;
-    private ImageView gifView;
+    private ImageView gifView, bell;
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +36,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -41,12 +45,14 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ImageView ivGif = (ImageView) findViewById(R.id.gif_animation);
-
-        Glide.with(this).load(R.raw.ps1).asGif().into(ivGif);
-        counts = (TextView) findViewById(R.id.count_down);
         gifView = (ImageView) findViewById(R.id.gif_animation);
+        gifView.setScaleX(0.75f);
+        gifView.setScaleY(0.75f);
 
+        bell = (ImageView) findViewById(R.id.alarm_bell);
+
+        Glide.with(this).load(R.raw.p1).asGif().into(gifView);
+        counts = (TextView) findViewById(R.id.count_down);
         operate = (Button) findViewById(R.id.start_btn);
         operate.setOnClickListener(this);
 
@@ -54,7 +60,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -84,38 +89,55 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-
-        } else if (id == R.id.nav_gallery) {
-
+        switch (id){
+            case R.id.nav_report:
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            case R.id.nav_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            case R.id.nav_help:
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            default:
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     @Override
     public void onClick(View v) {
+        String s = loadString("push_up_duration", "5");
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
         operate.setVisibility(View.GONE);
         gifView.setVisibility(View.VISIBLE);
-        countDown();
+        int k = Integer.parseInt(s);
+        countDown(k);
 
     }
 
-    private void countDown() {
-        new CountDownTimer(120000, 1000) {
+    private void countDown(final int i) {
+        new CountDownTimer(i*60*1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                counts.setText("" + millisUntilFinished / 1000);
+                String rem = String.format("%02d:%02d:%02d", ((millisUntilFinished / 1000)/3600)%24, ((millisUntilFinished / 1000)/60)%60, (millisUntilFinished / 1000)/(i%60)%60);
+                counts.setText(rem);
             }
 
             @Override
             public void onFinish() {
-                counts.setText("DONE: 0:0");
+                counts.setText("DONE!");
                 gifView.setVisibility(View.GONE);
                 operate.setVisibility(View.VISIBLE);
+                bell.setVisibility(View.VISIBLE);
             }
         }.start();
+    }
+
+    public String loadString(String key, String defaultValue) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String savedValue = sharedPreferences.getString(key, defaultValue);
+        return savedValue;
     }
 }
