@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+import java.util.concurrent.TimeUnit;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
     private boolean counnting;
@@ -121,8 +123,8 @@ public class MainActivity extends AppCompatActivity
         new CountDownTimer(i*60*1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                String rem = String.format("%02d:%02d:%02d", ((millisUntilFinished / 1000)/3600)%24, ((millisUntilFinished / 1000)/60)%60, (millisUntilFinished / 1000)/(i%60)%60);
-                counts.setText(rem);
+                String time = timeFormatter(millisUntilFinished);
+                counts.setText(time);
             }
 
             @Override
@@ -137,7 +139,16 @@ public class MainActivity extends AppCompatActivity
 
     public String loadString(String key, String defaultValue) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String savedValue = sharedPreferences.getString(key, defaultValue);
-        return savedValue;
+        return sharedPreferences.getString(key, defaultValue);
+    }
+
+    private String timeFormatter(long milliseconds) {
+        return String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(milliseconds),
+                TimeUnit.MILLISECONDS.toMinutes(milliseconds) % TimeUnit.HOURS.toMinutes(1),
+                TimeUnit.MILLISECONDS.toSeconds(milliseconds) % TimeUnit.MINUTES.toSeconds(1));
     }
 }
+
+/**
+ * String rem = String.format("%02d:%02d:%02d", ((millisUntilFinished / 1000)/3600)%24, ((millisUntilFinished / 1000)/60)%60, (millisUntilFinished / 1000)/(i%60)%60);
+ */
