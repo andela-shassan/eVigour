@@ -186,7 +186,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
                 return true;
             }
-            return super.onOptionsItemSelected(item);
+            return false;
         }
 
         @Override
@@ -244,7 +244,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
                 return true;
             }
-            return super.onOptionsItemSelected(item);
+            return false;
         }
     }
 
@@ -253,9 +253,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             finish();
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, MainActivity.class));
+        super.onBackPressed();
+    }
 }
