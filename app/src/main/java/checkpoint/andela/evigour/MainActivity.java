@@ -18,7 +18,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,16 +38,23 @@ public class MainActivity extends AppCompatActivity
     private ImageView gifView;
     private DrawerLayout drawer;
     private Ringtone ringtone;
+    private boolean isCounting;
     private String trainingMethod, pushUpDuration, pushUpNumber;
     private Sensor proximity;
     private SensorManager sensorManager;
-    private int number;
+    private int pushUpCounter;
     private CountDownTimer countDownTimer = null;
+    private int pushUpRemaining;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initialize();
+    }
+
+    private void initialize() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -74,25 +80,17 @@ public class MainActivity extends AppCompatActivity
         done_btn = (Button) findViewById(R.id.done_btn);
         done_btn.setOnClickListener(this);
 
-        ringtone = playTone();
+        trainingMethod = loadPreference("training_method_list", "0");
+        pushUpDuration = loadPreference("push_up_duration", "5");
+        pushUpNumber = loadPreference("push_count", "10");
 
-        trainingMethod = loadString("training_method_list", "0");
-        pushUpDuration = loadString("push_up_duration", "5");
-        pushUpNumber = loadString("push_count", "10");
-        Log.d("semiu", " TM " + trainingMethod + " PN " + pushUpNumber + " PD " + pushUpDuration);
-
-        //sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        //proximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-
+        ringtone = getTone();
         checkSetting();
-        //listSensors();
-
     }
 
     private void checkSetting() {
-        trainingMethod = loadString("training_method_list", "0");
+        trainingMethod = loadPreference("training_method_list", "0");
         if (trainingMethod.contains("1")) {
-
             countView.setText(pushUpNumber + " Push ups");
         } else {
             int i = Integer.parseInt(pushUpDuration);
@@ -114,81 +112,106 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         switch (id) {
             case R.id.nav_report:
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
+                break;
             case R.id.nav_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
+                break;
             case R.id.nav_help:
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
-            default:
-                drawer.closeDrawer(GravityCompat.START);
-                return true;
+                break;
         }
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        int duration;
         switch (id) {
             case R.id.start_btn:
-                //if (start_btn.getText().toString().startsWith("Start")) {
-                sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-                proximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-                sensorManager.registerListener(this, proximity, sensorManager.SENSOR_DELAY_NORMAL);
-                if (!countView.getText().toString().contains("Push")) {
-                    String time = loadString("push_up_duration", "5");
-                    Toast.makeText(this, time + " Minute(s) Push Ups", Toast.LENGTH_LONG).show();
-                    start_btn.setVisibility(View.GONE);
-                    gifView.setVisibility(View.VISIBLE);
-                    cancel_btn.setVisibility(View.VISIBLE);
-                    duration = Integer.parseInt(time);
-                    countDown(duration).start();
-                    // } else if (start_btn.getText().toString().startsWith("Done")) {
-                    //ringtone.stop();
-                    //checkSetting();
-                    //start_btn.setText("Start");
-                } else {
-                    String number = loadString("push_count", "10");
-                    Toast.makeText(this, number + " Push Ups", Toast.LENGTH_LONG).show();
-                    start_btn.setVisibility(View.GONE);
-                    gifView.setVisibility(View.VISIBLE);
-                    cancel_btn.setVisibility(View.VISIBLE);
-                }
+                registerSensor();
+                startPushUp();
                 break;
             case R.id.cancel_btn:
-                countDownTimer.cancel();
-                cancel_btn.setVisibility(View.GONE);
-                start_btn.setVisibility(View.VISIBLE);
+                if (isCounting) {
+                    countDownTimer.cancel();
+                }
                 gifView.setVisibility(View.GONE);
-                sensorManager.unregisterListener(this);
-                checkSetting();
+                cancel_btn.setVisibility(View.GONE);
+                setHomeView();
+                pushUpCounter = 0;
                 break;
             case R.id.done_btn:
                 ringtone.stop();
                 done_btn.setVisibility(View.GONE);
-                sensorManager.unregisterListener(this);
-                checkSetting();
-                start_btn.setVisibility(View.VISIBLE);
+                setHomeView();
                 break;
         }
     }
 
+    private void registerSensor() {
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        proximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        sensorManager.registerListener(this, proximity, sensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    private void setHomeView() {
+        start_btn.setVisibility(View.VISIBLE);
+        sensorManager.unregisterListener(this);
+        checkSetting();
+    }
+
+    private void startPushUp() {
+        int duration;
+        if (!countView.getText().toString().contains("Push")) {
+            String time = loadPreference("push_up_duration", "5");
+            setButton(View.GONE, View.VISIBLE);
+            duration = Integer.parseInt(time);
+            countDown(duration).start();
+        } else {
+            String number = loadPreference("push_count", "10");
+            setButton(View.GONE, View.VISIBLE);
+            setCountView(number);
+        }
+    }
+
+    private void setButton(int gone, int visible) {
+        start_btn.setVisibility(gone);
+        gifView.setVisibility(visible);
+        cancel_btn.setVisibility(visible);
+    }
+
+    private void setCountView(String number) {
+        if (!isCounting) {
+            pushUpRemaining = Integer.parseInt(number);
+            pushUpRemaining -= pushUpCounter;
+            String k = String.valueOf(pushUpRemaining);
+            countView.setText(k);
+            if (pushUpRemaining == 0) {
+                setButtonsDone();
+                ringtone.play();
+                sensorManager.unregisterListener(this);
+                pushUpCounter = 0;
+            }
+        }
+    }
+
+    private void setButtonsDone() {
+        gifView.setVisibility(View.GONE);
+        cancel_btn.setVisibility(View.GONE);
+        done_btn.setVisibility(View.VISIBLE);
+    }
+
     private CountDownTimer countDown(final int i) {
+        isCounting = true;
         countDownTimer = new CountDownTimer(i * 60 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
@@ -198,23 +221,21 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFinish() {
-                countView.setText("00:00:00");
-                gifView.setVisibility(View.GONE);
-                cancel_btn.setVisibility(View.GONE);
-                done_btn.setVisibility(View.VISIBLE);
+                setButtonsDone();
                 ringtone.play();
+                countView.setText("00:00:00");
                 sensorManager.unregisterListener(MainActivity.this);
             }
         };
         return countDownTimer;
     }
 
-    private Ringtone playTone() {
-        Uri ringtone = Uri.parse(loadString("evigour_notifications_tone", DEFAULT_EVIGOUR_TONE));
+    private Ringtone getTone() {
+        Uri ringtone = Uri.parse(loadPreference("evigour_notifications_tone", DEFAULT_EVIGOUR_TONE));
         return RingtoneManager.getRingtone(this, ringtone);
     }
 
-    public String loadString(String key, String defaultValue) {
+    public String loadPreference(String key, String defaultValue) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         return sharedPreferences.getString(key, defaultValue);
     }
@@ -226,39 +247,32 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackPressed() {
-        if (ringtone.isPlaying()) {
-            ringtone.stop();
-            Log.d("semiu", String.valueOf(ringtone.isPlaying()));
-        }
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        sensorManager.registerListener(this, proximity, sensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    @Override
-    protected void onPause() {
-        //sensorManager.unregisterListener(this);
-        super.onPause();
-    }
-
-    @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.values[0] == 0) {
-            number++;
-            Toast.makeText(this, "Proximity " + number, Toast.LENGTH_SHORT).show();
+            pushUpCounter++;
+            setCountView(pushUpNumber);
+            Toast.makeText(this, "Proximity " + pushUpCounter, Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+    @Override
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            minimize();
+        }
+    }
+
+    private void minimize() {
+        ringtone.stop();
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
     }
 
 }
