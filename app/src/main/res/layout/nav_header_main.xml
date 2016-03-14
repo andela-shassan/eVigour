@@ -9,19 +9,23 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:weightSum="1">
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/sym_def_app_icon" />
+        android:layout_width="189dp"
+        android:layout_height="0dp"
+        android:src="@drawable/evigour_icon"
+        android:layout_weight="0.97"
+        android:layout_marginLeft="0dp" />
 
-    <TextView
+    <!--<TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="eVigour"
+        android:visibility="gone"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="40sp"/>
+        android:textSize="40sp"/>-->
 
 </LinearLayout>

@@ -30,6 +30,8 @@ import com.bumptech.glide.Glide;
 
 import java.util.concurrent.TimeUnit;
 
+import checkpoint.andela.helpers.MyNotificationManager;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, SensorEventListener {
     private static final String DEFAULT_EVIGOUR_TONE = "content://settings/system/notification_sound";
@@ -42,9 +44,8 @@ public class MainActivity extends AppCompatActivity
     private String trainingMethod, pushUpDuration, pushUpNumber;
     private Sensor proximity;
     private SensorManager sensorManager;
-    private int pushUpCounter;
+    private int pushUpCounter, pushUpRemaining;
     private CountDownTimer countDownTimer = null;
-    private int pushUpRemaining;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +153,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.done_btn:
                 ringtone.stop();
                 done_btn.setVisibility(View.GONE);
+                MyNotificationManager.buildNotification(this, pushUpCounter);
                 setHomeView();
                 break;
         }
