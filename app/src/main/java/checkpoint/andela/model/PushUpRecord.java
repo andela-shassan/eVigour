@@ -1,5 +1,9 @@
 package checkpoint.andela.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by andela on 14/03/2016.
  */
@@ -9,10 +13,11 @@ public class PushUpRecord {
     private int numberOfPushUp;
 
     public PushUpRecord() {
+        this.date = setDate();
     }
 
-    public PushUpRecord(String date, int numberOfPushUp) {
-        this.date = date;
+    public PushUpRecord(int numberOfPushUp) {
+        this.date = setDate();
         this.numberOfPushUp = numberOfPushUp;
     }
 
@@ -24,15 +29,16 @@ public class PushUpRecord {
         return date;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
     public int getNumberOfPushUp() {
         return numberOfPushUp;
     }
 
     public void setNumberOfPushUp(int numberOfPushUp) {
         this.numberOfPushUp = numberOfPushUp;
+    }
+
+    public String setDate() {
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        return formatter.format(new Date());
     }
 }

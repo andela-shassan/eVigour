@@ -3,12 +3,12 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="checkpoint.andela.evigour.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="checkpoint.andela.helpers.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="checkpoint.andela.evigour.SettingsActivity$NotificationPreferenceFragment"
+        android:fragment="checkpoint.andela.helpers.SettingsActivity$NotificationPreferenceFragment"
         android:icon="@drawable/ic_notifications_black_24dp"
         android:title="@string/pref_header_notifications" />
 

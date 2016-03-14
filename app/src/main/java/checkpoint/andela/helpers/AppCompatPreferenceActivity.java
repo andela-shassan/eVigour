@@ -1,4 +1,4 @@
-package checkpoint.andela.evigour;
+package checkpoint.andela.helpers;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

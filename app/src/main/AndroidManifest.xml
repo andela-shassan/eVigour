@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="checkpoint.andela.helpers.SettingsActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_activity_settings" >
             <meta-data

@@ -1,4 +1,4 @@
-package checkpoint.andela.evigour;
+package checkpoint.andela.helpers;
 
 
 import android.annotation.TargetApi;
@@ -26,6 +26,8 @@ import java.util.List;
 
 import checkpoint.andela.dialogs.NumberPickerDialog;
 import checkpoint.andela.dialogs.TimePickerDialog;
+import checkpoint.andela.evigour.MainActivity;
+import checkpoint.andela.evigour.R;
 
 
 public class SettingsActivity extends AppCompatPreferenceActivity {

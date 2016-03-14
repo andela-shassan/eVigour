@@ -2,6 +2,7 @@ package checkpoint.andela.evigour;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -24,13 +25,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
 import java.util.concurrent.TimeUnit;
 
+import checkpoint.andela.db.PushUpRecordDB;
 import checkpoint.andela.helpers.MyNotificationManager;
+import checkpoint.andela.helpers.SettingsActivity;
+import checkpoint.andela.model.PushUpRecord;
+
+import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, SensorEventListener {
@@ -44,8 +49,11 @@ public class MainActivity extends AppCompatActivity
     private String trainingMethod, pushUpDuration, pushUpNumber;
     private Sensor proximity;
     private SensorManager sensorManager;
-    private int pushUpCounter, pushUpRemaining;
+    private int pushUpCounter, pushUpRemaining, pushMade;
     private CountDownTimer countDownTimer = null;
+    private SQLiteDatabase db;
+    private PushUpRecordDB recordDB;
+    private PushUpRecord pushUpRecord, p;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +94,10 @@ public class MainActivity extends AppCompatActivity
         pushUpNumber = loadPreference("push_count", "10");
 
         ringtone = getTone();
+
+        recordDB = new PushUpRecordDB(this);
+        db = recordDB.getReadableDatabase();
+        p = new PushUpRecord();
         checkSetting();
     }
 
@@ -138,6 +150,7 @@ public class MainActivity extends AppCompatActivity
         int id = v.getId();
         switch (id) {
             case R.id.start_btn:
+                pushMade = 0;
                 registerSensor();
                 startPushUp();
                 break;
@@ -153,10 +166,22 @@ public class MainActivity extends AppCompatActivity
             case R.id.done_btn:
                 ringtone.stop();
                 done_btn.setVisibility(View.GONE);
-                MyNotificationManager.buildNotification(this, pushUpCounter);
+                saveRecord(pushMade);
                 setHomeView();
                 break;
         }
+    }
+
+    private void saveRecord(int pushMade) {
+        pushUpRecord = cupboard().withDatabase(db).query(PushUpRecord.class).withSelection("date = ?", p.getDate()).get();
+        if (pushUpRecord != null) {
+            pushUpRecord.setNumberOfPushUp(pushUpRecord.getNumberOfPushUp() + pushMade);
+        } else {
+            pushUpRecord = new PushUpRecord();
+            pushUpRecord.setNumberOfPushUp(pushMade);
+        }
+        cupboard().withDatabase(db).put(pushUpRecord);
+        MyNotificationManager.buildNotification(this, pushUpRecord.getNumberOfPushUp());
     }
 
     private void registerSensor() {
@@ -166,6 +191,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setHomeView() {
+
         start_btn.setVisibility(View.VISIBLE);
         sensorManager.unregisterListener(this);
         checkSetting();
@@ -252,13 +278,14 @@ public class MainActivity extends AppCompatActivity
     public void onSensorChanged(SensorEvent event) {
         if (event.values[0] == 0) {
             pushUpCounter++;
+            pushMade = pushUpCounter;
             setCountView(pushUpNumber);
-            Toast.makeText(this, "Proximity " + pushUpCounter, Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
 
     @Override
     public void onBackPressed() {

@@ -25,11 +25,11 @@ public class PushUpRecordDB extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
+        cupboard().withDatabase(db).createTables();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        cupboard().withDatabase(db).upgradeTables();
     }
 }
