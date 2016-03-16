@@ -31,6 +31,7 @@ import com.bumptech.glide.Glide;
 import java.util.concurrent.TimeUnit;
 
 import checkpoint.andela.db.PushUpRecordDB;
+import checkpoint.andela.graph.ReportGraph;
 import checkpoint.andela.helpers.MyNotificationManager;
 import checkpoint.andela.helpers.SettingsActivity;
 import checkpoint.andela.model.PushUpRecord;
@@ -134,6 +135,7 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_report:
+                startActivity(new Intent(this, ReportGraph.class));
                 break;
             case R.id.nav_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -303,5 +305,4 @@ public class MainActivity extends AppCompatActivity
         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startMain);
     }
-
 }

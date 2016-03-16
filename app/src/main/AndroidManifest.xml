@@ -21,8 +21,13 @@
         </activity>
         <activity
             android:name="checkpoint.andela.helpers.SettingsActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_settings" >
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="checkpoint.andela.evigour.MainActivity" />
+        </activity>
+        <activity android:name="checkpoint.andela.graph.ReportGraph">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="checkpoint.andela.evigour.MainActivity" />
