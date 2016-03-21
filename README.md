@@ -11,8 +11,8 @@ This is an android application that helps you to plan your daily exercise. It re
 - You have the freedom to between the number of push ups you want to be doing daily or the amount of time you will be spending doing it. 
 - Beautiful animation that shows you how push up is been done.
 
-![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-37-55-281.jpeg)
-![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-41-25-398.jpeg)
+![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-37-55-281.jpeg) ![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-41-25-398.jpeg)
+
 
 
 ## Get To Know eVigour  
