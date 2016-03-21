@@ -1,7 +1,12 @@
 package checkpoint.andela.evigour;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,6 +18,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,13 +34,16 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import checkpoint.andela.db.PushUpRecordDB;
 import checkpoint.andela.graph.ReportGraph;
-import checkpoint.andela.helpers.MyNotificationManager;
+import checkpoint.andela.helpers.EvigourHelper;
 import checkpoint.andela.helpers.SettingsActivity;
 import checkpoint.andela.model.PushUpRecord;
+import checkpoint.andela.services.EVigourBroadcastReceiver;
+import checkpoint.andela.services.EvigourBootReceiver;
 
 import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 
@@ -100,6 +109,7 @@ public class MainActivity extends AppCompatActivity
         db = recordDB.getReadableDatabase();
         p = new PushUpRecord();
         checkSetting();
+        setReminder(this);
     }
 
     private void checkSetting() {
@@ -123,7 +133,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            EvigourHelper.launch(this, SettingsActivity.class);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -135,12 +145,10 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_report:
-                startActivity(new Intent(this, ReportGraph.class));
+                EvigourHelper.launch(this, ReportGraph.class);
                 break;
             case R.id.nav_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
-            case R.id.nav_help:
+                EvigourHelper.launch(this, SettingsActivity.class);
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
@@ -183,32 +191,31 @@ public class MainActivity extends AppCompatActivity
             pushUpRecord.setNumberOfPushUp(pushMade);
         }
         cupboard().withDatabase(db).put(pushUpRecord);
-        MyNotificationManager.buildNotification(this, pushUpRecord.getNumberOfPushUp());
+        EvigourHelper.buildNotification(this, "eVigour", "You've completed " +
+                pushUpRecord.getNumberOfPushUp() + " push ups today");
     }
 
     private void registerSensor() {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         proximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-        sensorManager.registerListener(this, proximity, sensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, proximity, sensorManager.SENSOR_STATUS_ACCURACY_HIGH);
     }
 
     private void setHomeView() {
-
         start_btn.setVisibility(View.VISIBLE);
         sensorManager.unregisterListener(this);
         checkSetting();
     }
 
     private void startPushUp() {
+        setButton(View.GONE, View.VISIBLE);
         int duration;
         if (!countView.getText().toString().contains("Push")) {
             String time = loadPreference("push_up_duration", "5");
-            setButton(View.GONE, View.VISIBLE);
             duration = Integer.parseInt(time);
             countDown(duration).start();
         } else {
             String number = loadPreference("push_count", "10");
-            setButton(View.GONE, View.VISIBLE);
             setCountView(number);
         }
     }
@@ -226,7 +233,7 @@ public class MainActivity extends AppCompatActivity
             String k = String.valueOf(pushUpRemaining);
             countView.setText(k);
             if (pushUpRemaining == 0) {
-                setButtonsDone();
+                setDoneButton();
                 ringtone.play();
                 sensorManager.unregisterListener(this);
                 pushUpCounter = 0;
@@ -234,7 +241,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setButtonsDone() {
+    private void setDoneButton() {
         gifView.setVisibility(View.GONE);
         cancel_btn.setVisibility(View.GONE);
         done_btn.setVisibility(View.VISIBLE);
@@ -251,7 +258,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onFinish() {
-                setButtonsDone();
+                setDoneButton();
                 ringtone.play();
                 countView.setText("00:00:00");
                 sensorManager.unregisterListener(MainActivity.this);
@@ -304,5 +311,77 @@ public class MainActivity extends AppCompatActivity
         startMain.addCategory(Intent.CATEGORY_HOME);
         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startMain);
+    }
+
+    public void setReminder(Context context) {
+        SharedPreferences sharedPreference = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean isReminder = sharedPreference.getBoolean("daily_reminder_switch", false);
+
+        if (isReminder) {
+            setAlarm();
+            enableBootReceiver(this);
+        } else {
+            cancelAlarm();
+            cancelBootReceiver(this);
+        }
+
+    }
+
+    @NonNull
+    protected Calendar setCalendar(int hour, int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+        return calendar;
+    }
+
+    private void setAlarm() {
+        String interval = loadPreference("reminder_interval", "1");
+        String time = loadPreference("daily_reminder_time", "07:00");
+
+        String[] hhmm = time.split(":");
+        int hour = Integer.parseInt(hhmm[0]);
+        int minute = Integer.parseInt(hhmm[1]);
+        int inter = Integer.parseInt(interval);
+
+        AlarmManager reminder = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, EVigourBroadcastReceiver.class);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this,
+                2324, intent, 0);
+
+        Calendar calendar = setCalendar(hour, minute);
+
+        reminder.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                (AlarmManager.INTERVAL_DAY * inter), pIntent);
+    }
+
+    public void cancelAlarm() {
+        Intent intent = new Intent(getApplicationContext(), EVigourBroadcastReceiver.class);
+        final PendingIntent pIntent = PendingIntent.getBroadcast(this, 2324,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        if (alarm != null) {
+            alarm.cancel(pIntent);
+        }
+    }
+
+    private void enableBootReceiver(Context context) {
+        ComponentName receiver = new ComponentName(context, EvigourBootReceiver.class);
+        PackageManager pm = context.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
+    private void cancelBootReceiver(Context context) {
+        ComponentName receiver = new ComponentName(context, EvigourBootReceiver.class);
+        PackageManager pm = context.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
     }
 }
