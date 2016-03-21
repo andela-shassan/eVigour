@@ -7,10 +7,12 @@
         android:key="training_method_list"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
+        android:textColor="@color/eVigourPrimaryText"
         android:title="@string/pref_title_training_method" />
 
     <checkpoint.andela.dialogs.NumberPickerDialog
         android:dependency="training_method_list"
+        android:textColor="@color/eVigourPrimaryText"
         android:key="number_of_push_up"
         android:title="@string/pref_number_of_push_up_title" />
 
@@ -20,19 +22,36 @@
         android:dependency="training_method_list"
         android:inputType="number"
         android:key="push_up_duration"
+        android:textColor="@color/eVigourPrimaryText"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/pref_push_up_duration_title" />
 
     <SwitchPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="daily_reminder_switch"
+        android:textColor="@color/eVigourPrimaryText"
         android:title="@string/pref_daily_reminder" />
+
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="@string/pref_push_up_reminder_default"
+        android:dependency="daily_reminder_switch"
+        android:inputType="number"
+        android:key="reminder_interval"
+        android:summary="%s Day(s)"
+        android:textColor="@color/eVigourPrimaryText"
+        android:maxLines="1"
+        android:autoLink="all"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_push_up_reminder_interval" />
 
     <checkpoint.andela.dialogs.TimePickerDialog
         android:dependency="daily_reminder_switch"
         android:key="push_daily_reminder"
+        android:textColor="@color/eVigourPrimaryText"
         android:title="Reminder Time" />
 
 </PreferenceScreen>

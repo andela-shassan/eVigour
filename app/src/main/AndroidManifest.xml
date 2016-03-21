@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="checkpoint.andela.evigour">
 
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,7 +16,7 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/eVigour.Theme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,16 +26,41 @@
         <activity
             android:name="checkpoint.andela.helpers.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.eOthers">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="checkpoint.andela.evigour.MainActivity" />
         </activity>
-        <activity android:name="checkpoint.andela.graph.ReportGraph">
+        <activity
+            android:name="checkpoint.andela.graph.ReportGraph"
+            android:theme="@style/AppTheme.eOthers">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="checkpoint.andela.evigour.MainActivity" />
         </activity>
+
+        <service
+            android:name="checkpoint.andela.services.EVigourIntentService"
+            android:exported="false" />
+
+        <receiver
+            android:name="checkpoint.andela.services.EVigourBroadcastReceiver"
+            android:enabled="true"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="checkpoint.andela.services.EvigourBootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
