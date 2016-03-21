@@ -1,5 +1,6 @@
 package checkpoint.andela.evigour;
 
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,6 +51,15 @@ public class MainActivityTest {
     }
 
     @Test
+    public void testDrawableIcons() throws Exception {
+        Drawable thumbUp = activity.getResources().getDrawable(R.drawable.thumbs_up_p_24);
+        assertNotNull(thumbUp);
+
+        Drawable notify = activity.getResources().getDrawable(R.drawable.notify);
+        assertNotNull(notify);
+    }
+
+    @Test
     public void testOnNavigationItemSelected() throws Exception {
         MenuItem drawer = new RoboMenuItem(R.menu.activity_main_drawer);
         assertNotNull(drawer);
@@ -90,7 +100,7 @@ public class MainActivityTest {
 
     @Test
     public void testSetAlarm() throws Exception {
-      //  AlarmManager alarmManager = activity.setAlarm();
+
     }
 
     @Test

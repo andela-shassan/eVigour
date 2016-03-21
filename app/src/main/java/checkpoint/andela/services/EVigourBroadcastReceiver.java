@@ -23,7 +23,12 @@ public class EVigourBroadcastReceiver extends BroadcastReceiver {
         int hour = Integer.parseInt(hhmm[0]);
         int minute = Integer.parseInt(hhmm[1]);
 
-        if (calendar.get(Calendar.HOUR) == hour && calendar.get(Calendar.MINUTE) == minute) {
+        int calendarHour = calendar.get(Calendar.HOUR);
+        if (calendar.get(Calendar.AM_PM) == Calendar.PM){
+            calendarHour += 12;
+        }
+
+        if (calendarHour == hour && calendar.get(Calendar.MINUTE) == minute) {
             context.startService(new Intent(context, EVigourIntentService.class));
         }
 

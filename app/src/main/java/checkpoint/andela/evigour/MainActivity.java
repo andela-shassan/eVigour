@@ -64,6 +64,10 @@ public class MainActivity extends AppCompatActivity
     private SQLiteDatabase db;
     private PushUpRecordDB recordDB;
     private PushUpRecord pushUpRecord, p;
+    private AlarmManager reminder = null;
+    private PendingIntent pIntent;
+    private ComponentName receiver;
+    private PackageManager pm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +108,9 @@ public class MainActivity extends AppCompatActivity
         pushUpNumber = loadPreference("push_count", "10");
 
         ringtone = getTone();
+
+        receiver = new ComponentName(this, EvigourBootReceiver.class);
+        pm = this.getPackageManager();
 
         recordDB = new PushUpRecordDB(this);
         db = recordDB.getReadableDatabase();
@@ -319,12 +326,11 @@ public class MainActivity extends AppCompatActivity
 
         if (isReminder) {
             setAlarm();
-            enableBootReceiver(this);
+            enableBootReceiver();
         } else {
             cancelAlarm();
-            cancelBootReceiver(this);
+            cancelBootReceiver();
         }
-
     }
 
     @NonNull
@@ -346,40 +352,28 @@ public class MainActivity extends AppCompatActivity
         int minute = Integer.parseInt(hhmm[1]);
         int inter = Integer.parseInt(interval);
 
-        AlarmManager reminder = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, EVigourBroadcastReceiver.class);
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this,
-                2324, intent, 0);
-
         Calendar calendar = setCalendar(hour, minute);
 
+        reminder = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, EVigourBroadcastReceiver.class);
+        pIntent = PendingIntent.getBroadcast(this, 2324, intent, 0);
         reminder.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 (AlarmManager.INTERVAL_DAY * inter), pIntent);
     }
 
-    public void cancelAlarm() {
-        Intent intent = new Intent(getApplicationContext(), EVigourBroadcastReceiver.class);
-        final PendingIntent pIntent = PendingIntent.getBroadcast(this, 2324,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        if (alarm != null) {
-            alarm.cancel(pIntent);
+    private void cancelAlarm() {
+        if (reminder != null) {
+            reminder.cancel(pIntent);
         }
     }
 
-    private void enableBootReceiver(Context context) {
-        ComponentName receiver = new ComponentName(context, EvigourBootReceiver.class);
-        PackageManager pm = context.getPackageManager();
-
+    private void enableBootReceiver() {
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
     }
 
-    private void cancelBootReceiver(Context context) {
-        ComponentName receiver = new ComponentName(context, EvigourBootReceiver.class);
-        PackageManager pm = context.getPackageManager();
-
+    private void cancelBootReceiver() {
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
