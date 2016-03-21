@@ -6,7 +6,7 @@
         android:title="@string/pref_evigour_notifications" />
 
     <RingtonePreference
-        android:defaultValue="content://settings/system/notification_sound"
+        android:defaultValue="@string/evigour_default_ringtone"
         android:dependency="evigour_notifications_switch"
         android:key="evigour_notifications_tone"
         android:ringtoneType="ringtone"

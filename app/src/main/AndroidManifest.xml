@@ -11,6 +11,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,8 +20,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" />
+            android:name="checkpoint.andela.helpers.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="checkpoint.andela.evigour.MainActivity" />
+        </activity>
+        <activity android:name="checkpoint.andela.graph.ReportGraph">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="checkpoint.andela.evigour.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
