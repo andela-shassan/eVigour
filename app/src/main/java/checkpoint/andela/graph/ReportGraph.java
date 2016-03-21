@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -47,6 +48,11 @@ public class ReportGraph extends AppCompatActivity {
         reportGraph();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+
     public void reportGraph() {
         ArrayList<Entry> values = new ArrayList<>();
         ArrayList<String> labels = new ArrayList<>();
@@ -69,6 +75,10 @@ public class ReportGraph extends AppCompatActivity {
                 }
             } finally {
                 pushRecords.close();
+            }
+            if (values.size() > 7){
+                labels = new ArrayList<>(labels.subList(labels.size() - 7, labels.size()));
+                values = new ArrayList<>(values.subList(values.size() - 7, values.size()));
             }
             LineDataSet report = new LineDataSet(values, " Push up record");
             report.setAxisDependency(YAxis.AxisDependency.LEFT);

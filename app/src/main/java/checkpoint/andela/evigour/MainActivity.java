@@ -353,7 +353,9 @@ public class MainActivity extends AppCompatActivity
         int inter = Integer.parseInt(interval);
 
         Calendar calendar = setCalendar(hour, minute);
-
+        if(calendar.getTimeInMillis() < System.currentTimeMillis()){
+            return;
+        }
         reminder = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, EVigourBroadcastReceiver.class);
         pIntent = PendingIntent.getBroadcast(this, 2324, intent, 0);

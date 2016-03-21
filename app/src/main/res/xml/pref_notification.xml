@@ -1,13 +1,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
+    <!--<SwitchPreference
         android:defaultValue="true"
+         android:dependency="evigour_notifications_switch"
         android:key="evigour_notifications_switch"
-        android:title="@string/pref_evigour_notifications" />
+        android:title="@string/pref_evigour_notifications" />-->
 
     <RingtonePreference
         android:defaultValue="@string/evigour_default_ringtone"
-        android:dependency="evigour_notifications_switch"
         android:key="evigour_notifications_tone"
         android:ringtoneType="ringtone"
         android:title="@string/pref_evigour_ringtone" />
