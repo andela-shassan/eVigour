@@ -11,7 +11,7 @@ import static nl.qbusict.cupboard.CupboardFactory.cupboard;
 /**
  * Created by andela on 14/03/2016.
  */
-public class PushUpRecordDB extends SQLiteOpenHelper{
+public class PushUpRecordDB extends SQLiteOpenHelper {
     private static final String DB_NAME = "evigour.db";
     private static final int DB_VERSION = 1;
 
