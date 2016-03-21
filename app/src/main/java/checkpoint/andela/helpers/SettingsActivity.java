@@ -3,7 +3,6 @@ package checkpoint.andela.helpers;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -19,8 +18,12 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import java.util.List;
 
@@ -66,14 +69,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     }
                 }
 
-            } else if (preference instanceof EditTextPreference) {
+            } else if (preference.getKey().matches("push_up_duration")) {
                 preference.setSummary(stringValue + " Minutes");
+            } else if (preference.getKey().matches("reminder_interval")) {
+                preference.setSummary(stringValue + " Day(s)");
             } else {
                 preference.setSummary(stringValue);
             }
             return true;
         }
     };
+    private Toolbar toolbar;
 
     /**
      * Helper method to determine if the device has an extra-large screen. For
@@ -105,6 +111,25 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        LinearLayout parent = (LinearLayout) findViewById(android.R.id.list)
+                .getParent().getParent().getParent();
+        toolbar = (Toolbar) LayoutInflater.from(this)
+                .inflate(R.layout.toolbar, parent, false);
+
+        toolbar.setNavigationIcon(R.drawable.back_setting);
+        parent.addView(toolbar, 0);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+        toolbar.setTitle(getTitle());
     }
 
     private void setupActionBar() {
@@ -144,7 +169,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static class GeneralPreferenceFragment extends PreferenceFragment {
         private ListPreference lPref;
         private NumberPickerDialog nPref;
-        private EditTextPreference ePref;
+        private EditTextPreference duration, interval;
         private TimePickerDialog cPref;
 
         @Override
@@ -159,26 +184,29 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             lPref = (ListPreference) findPreference("training_method_list");
             nPref = (NumberPickerDialog) findPreference("number_of_push_up");
             nPref.setSummary(nPref.loadString() + " Push Ups");
-            ePref = (EditTextPreference) findPreference("push_up_duration");
-            ePref.setSummary(ePref.getText() + " Minutes");
+            duration = (EditTextPreference) findPreference("push_up_duration");
+            duration.setSummary(duration.getText() + " Minutes");
+            interval = (EditTextPreference) findPreference("reminder_interval");
+            interval.setSummary(interval.getText() + " Day(s)");
             cPref = (TimePickerDialog) findPreference("push_daily_reminder");
             cPref.setSummary(cPref.getTime() + " Daily");
 
             runnable.run();
         }
 
+
         @Override
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-
             if (preference instanceof ListPreference) {
                 if (((ListPreference) preference).getValue().matches("1")) {
-                    ePref.setEnabled(false);
+                    duration.setEnabled(false);
                     nPref.setEnabled(true);
                 } else {
                     nPref.setEnabled(false);
-                    ePref.setEnabled(true);
+                    duration.setEnabled(true);
                 }
             }
+            bindPreferenceSummaryToValue(findPreference("reminder_interval"));
             return super.onPreferenceTreeClick(preferenceScreen, preference);
         }
 
@@ -242,10 +270,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     @Override
     public void onBackPressed() {
-        if (getTitle().toString().startsWith("Setting")){
-            startActivity(new Intent(this, MainActivity.class));
-        }else {
-            startActivity(new Intent(this, SettingsActivity.class));
+        if (getTitle().toString().startsWith("Setting")) {
+            EvigourHelper.launch(this, MainActivity.class);
+        } else {
+            EvigourHelper.launch(this, SettingsActivity.class);
         }
         finish();
     }

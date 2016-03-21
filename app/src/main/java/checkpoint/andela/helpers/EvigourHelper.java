@@ -33,5 +33,9 @@ public class EvigourHelper {
         nManager.notify(2324, nBuilder.build());
     }
 
+    public static void launch(Context context, Class<?> destination){
+        context.startActivity(new Intent(context, destination));
+    }
+
 }
 

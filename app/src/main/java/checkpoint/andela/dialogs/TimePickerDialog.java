@@ -31,7 +31,7 @@ public class TimePickerDialog extends DialogPreference implements Preference.OnP
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        setSummary(newValue.toString() + " Daily");
+        setSummary(newValue.toString());
         saveTime("daily_reminder_time", newValue.toString());
         return false;
     }
@@ -62,7 +62,7 @@ public class TimePickerDialog extends DialogPreference implements Preference.OnP
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         super.onSetInitialValue(restorePersistedValue, defaultValue);
         if (restorePersistedValue) {
-            setSummary(getTime() + " Daily");
+            setSummary(getTime());
             if (defaultValue == null) {
                 time = getPersistedString(DEFAULT_TIME);
             } else {
@@ -70,7 +70,7 @@ public class TimePickerDialog extends DialogPreference implements Preference.OnP
             }
         } else {
             time = defaultValue.toString();
-            setSummary(time + " Daily");
+            setSummary(time);
             persistString(defaultValue.toString());
         }
     }
@@ -88,14 +88,14 @@ public class TimePickerDialog extends DialogPreference implements Preference.OnP
                 saveTime("daily_reminder_time", time);
             }
         }
-        setSummary(getTime() + " Daily");
+        setSummary(getTime());
     }
 
     public void saveTime(String key, String value) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(key, value);
-        editor.apply();
+        editor.commit();
     }
 
     public String getTime() {
