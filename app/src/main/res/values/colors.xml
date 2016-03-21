@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#9C27B0</color>
+    <color name="colorPrimaryDark">#7B1FA2</color>
+    <color name="primary_light">#E1BEE7</color>
+    <color name="colorAccent">#448AFF</color>
+    <color name="primary_text">#000000</color>
+    <color name="secondary_text">#727272</color>
+    <color name="background_material_light">#fafafa</color>
+    <color name="colorBackground">#d9000000</color>
+    <color name="eVigourColorPrimary">#9c27b0</color>
+    <color name="eVigourColorPrimaryDark">#7b1fa2</color>
+    <color name="eVigourColorAccent">#448aff</color>
+    <color name="eVigourBackground">#e6000000</color>
+    <color name="eVigourPrimaryText">#FFFFFF</color>
+    <color name="eVigourPrimaryTextInverse">#000000</color>
+    <color name="foreground_material_dark">#0d0c0c</color>
+</resources>
