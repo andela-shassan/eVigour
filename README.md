@@ -8,7 +8,7 @@ This is an android application that helps you to plan your daily exercise. It re
 - It automatically count and save the number of `Push ups` you do in a day.
 - It shows you a beautiful graphical representation of your performance in the last few days.
 - It gives you the freedom to choose whether to be reminded or not when it is time for the exercise.
-- You have the freedom to between the number of push ups you want to be doing daily or the amount of time you will be spending doing it. 
+- You have the freedom to choose between the number of push ups you want to be doing daily or the amount of time you will be spending doing it. 
 - Beautiful animation that shows you how push up is been done.
 
 ![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-37-55-281.jpeg) ![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-41-25-398.jpeg)
