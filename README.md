@@ -22,9 +22,9 @@ This is an android application that helps you to plan your daily exercise. It re
 - Notification tone will sond when the time set has elapsed or when the number of specified push ups has been achieved.
 - Click the done button and the number of push up achieved will be saved with a notification to confirm the process.
 
-![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-39-09-879.jpeg)
-![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-40-17-681.jpe)
 ![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-41-22-114.jpeg)
+![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-39-09-879.jpeg)
+![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-40-17-681.jpeg)
 ![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-38-57-436.jpeg)
 
 ## Dependencies  
