@@ -11,7 +11,8 @@ This is an android application that helps you to plan your daily exercise. It re
 - You have the freedom to choose between the number of push ups you want to be doing daily or the amount of time you will be spending doing it. 
 - Beautiful animation that shows you how push up is been done.
 
-![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-37-55-281.jpeg) ![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-41-25-398.jpeg)
+![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-37-55-281.jpeg) 
+![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-41-25-398.jpeg)
 
 
 
@@ -21,10 +22,10 @@ This is an android application that helps you to plan your daily exercise. It re
 - Notification tone will sond when the time set has elapsed or when the number of specified push ups has been achieved.
 - Click the done button and the number of push up achieved will be saved with a notification to confirm the process.
 
-![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-39-09-879.jpeg)
-![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-40-17-681.jpe)
-![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-41-22-114.jpeg)
-![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/app/src/main/res/raw/Screenshot_2016-03-21-17-38-57-436.jpeg)
+![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-39-09-879.jpeg)
+![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-40-17-681.jpe)
+![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-41-22-114.jpeg)
+![alt tag](https://github.com/andela-shassan/eVigour/blob/staging/assets/Screenshot_2016-03-21-17-38-57-436.jpeg)
 
 ## Dependencies  
 This project work uses `CUPBOARD` to interact with `SQLite` database.
